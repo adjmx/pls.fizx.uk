@@ -6,90 +6,73 @@ import { formatDistanceToNowStrict } from 'date-fns';
 import { Activity, Radio, Users, Layers, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-// ── Relay status card ────────────────────────────────────────────────────────
+// ── Relay comparison card ─────────────────────────────────────────────────────
+// Each column is its own component so hooks are called unconditionally.
 
-function RelayCard({ url, read, write }: { url: string; read: boolean; write: boolean }) {
+function RelayColumn({ url }: { url: string }) {
   const { data: info, isLoading, isError } = useRelayInfo(url);
   const domain = url.replace(/^wss?:\/\//, '');
 
   return (
-    <div className="bg-card border border-border p-4 min-w-[230px] max-w-[280px] shrink-0 flex flex-col gap-2 rounded-none">
-      <div className="flex items-center gap-2">
-        <span
-          className={`w-2 h-2 rounded-full shrink-0 ${
-            isError ? 'bg-red-500' : isLoading ? 'bg-amber-400 animate-pulse' : 'bg-primary'
-          }`}
-        />
-        <span className="font-mono text-xs text-foreground truncate">{domain}</span>
+    <div className="flex flex-col gap-2 p-4 min-w-0">
+      {/* Status + domain */}
+      <div className="flex items-center gap-1.5 min-w-0">
+        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+          isError ? 'bg-red-500' : isLoading ? 'bg-amber-400 animate-pulse' : 'bg-primary'
+        }`} />
+        <span className="font-mono text-[10px] text-foreground truncate">{domain}</span>
       </div>
+
+      {/* Name */}
+      {isLoading && <span className="text-[10px] font-mono text-muted-foreground/40 animate-pulse">querying…</span>}
+      {isError  && <span className="text-[10px] font-mono text-red-400/50">NIP-11 unavailable</span>}
+      {info?.name && <p className="text-[11px] font-semibold text-primary truncate">{info.name}</p>}
 
       {info && (
         <>
-          {info.name && (
-            <p className="text-xs font-semibold text-primary truncate">{info.name}</p>
-          )}
-          {info.description && (
-            <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
-              {info.description}
-            </p>
-          )}
-          <div className="flex flex-wrap gap-1 mt-auto">
-            {read && (
-              <span className="text-[9px] font-mono px-1 border border-primary/50 text-primary/80">READ</span>
-            )}
-            {write && (
-              <span className="text-[9px] font-mono px-1 border border-accent/50 text-accent/80">WRITE</span>
-            )}
+          {/* Capability badges */}
+          <div className="flex flex-wrap gap-1">
+            <span className="text-[9px] font-mono px-1 border border-primary/50 text-primary/80">READ</span>
+            <span className="text-[9px] font-mono px-1 border border-accent/50 text-accent/80">WRITE</span>
+            {info.limitation?.auth_required    && <span className="text-[9px] font-mono px-1 border border-amber-500/50 text-amber-500">AUTH</span>}
+            {info.limitation?.payment_required && <span className="text-[9px] font-mono px-1 border border-amber-500/50 text-amber-500">PAID</span>}
             {info.supported_nips && (
               <span className="text-[9px] font-mono px-1 border border-border text-muted-foreground">
                 {info.supported_nips.length} NIPs
               </span>
             )}
-            {info.limitation?.auth_required && (
-              <span className="text-[9px] font-mono px-1 border border-amber-500/50 text-amber-500">AUTH</span>
+          </div>
+
+          {/* Limits */}
+          <div className="text-[9px] font-mono text-muted-foreground/60 space-y-0.5">
+            {info.limitation?.max_message_length != null && (
+              <div>msg {(info.limitation.max_message_length / 1024).toFixed(0)} KB max</div>
             )}
-            {info.limitation?.payment_required && (
-              <span className="text-[9px] font-mono px-1 border border-amber-500/50 text-amber-500">PAID</span>
+            {info.limitation?.max_subscriptions != null && (
+              <div>{info.limitation.max_subscriptions} subs max</div>
+            )}
+            {info.limitation?.max_limit != null && (
+              <div>limit {info.limitation.max_limit}</div>
             )}
           </div>
 
-          {info.supported_nips && info.supported_nips.length > 0 && (
-            <div className="flex flex-wrap gap-[3px] mt-1">
-              {info.supported_nips.slice(0, 16).map(nip => (
-                <span key={nip} className="text-[9px] font-mono text-muted-foreground/50">NIP-{nip}</span>
-              ))}
-              {info.supported_nips.length > 16 && (
-                <span className="text-[9px] font-mono text-muted-foreground/30">
-                  +{info.supported_nips.length - 16}
-                </span>
-              )}
-            </div>
-          )}
-
+          {/* Software */}
           {info.software && (
-            <p className="text-[9px] font-mono text-muted-foreground/40 mt-1">
-              {info.software.split('/').pop()} {info.version ? `v${info.version}` : ''}
+            <p className="text-[9px] font-mono text-muted-foreground/30 mt-auto">
+              {info.software.split('/').pop()}{info.version ? ` v${info.version}` : ''}
             </p>
-          )}
-
-          {info.limitation && (
-            <div className="text-[9px] font-mono text-muted-foreground/50 space-y-0.5 border-t border-border/50 pt-1 mt-1">
-              {info.limitation.max_message_length != null && (
-                <div>max msg: {(info.limitation.max_message_length / 1024).toFixed(0)} KB</div>
-              )}
-              {info.limitation.max_subscriptions != null && (
-                <div>max subs: {info.limitation.max_subscriptions}</div>
-              )}
-              {info.limitation.max_limit != null && (
-                <div>max limit: {info.limitation.max_limit}</div>
-              )}
-            </div>
           )}
         </>
       )}
+    </div>
+  );
+}
 
-      {isError && <p className="text-[11px] font-mono text-red-400/60">NIP-11 unavailable</p>}
-      {isLoading && <p className="text-[11px] font-mono text-muted-foreground/50 animate-pulse">querying…</p>}
+function RelayComparisonCard({ urls }: { urls: string[] }) {
+  return (
+    <div className="bg-card border border-border divide-x divide-border grid"
+         style={{ gridTemplateColumns: `repeat(${urls.length}, minmax(0, 1fr))` }}>
+      {urls.map(url => <RelayColumn key={url} url={url} />)}
     </div>
   );
 }
@@ -205,24 +188,20 @@ export default function Index() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight mb-1">
             <span className="bg-gradient-to-r from-[#34d399] via-[#a78bfa] to-[#34d399] bg-clip-text text-transparent">
-              Nostr Relay Dashboard
+              Pulse
             </span>
           </h1>
           <p className="text-sm text-muted-foreground">
-            Real-time event statistics and relay information across the Nostr network
+            Real-time Nostr relay statistics and event feed
           </p>
         </div>
 
-        {/* Relay cards — display relays (NIP-11 info) */}
+        {/* Relay comparison card */}
         <section>
           <h2 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">
             Connected Relays
           </h2>
-          <div className="flex gap-3 overflow-x-auto pb-2">
-            {DISPLAY_RELAYS.map(url => (
-              <RelayCard key={url} url={url} read write />
-            ))}
-          </div>
+          <RelayComparisonCard urls={DISPLAY_RELAYS} />
         </section>
 
         {/* Streaming source label */}
