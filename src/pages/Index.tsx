@@ -5,10 +5,24 @@ import type { NostrEvent } from '@nostrify/nostrify';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { Activity, Radio, Users, Layers, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+
+// ── 21-bar ────────────────────────────────────────────────────────────────────
+const SQUARE_COUNT = 21;
+const SQUARE_DIM = '#161e2e';
+const EMERALD: [number, number, number] = [52, 211, 153];
+const PURPLE:  [number, number, number] = [167, 139, 250];
+function lerpHex(a: [number, number, number], b: [number, number, number], t: number) {
+  return `rgb(${Math.round(a[0]+(b[0]-a[0])*t)},${Math.round(a[1]+(b[1]-a[1])*t)},${Math.round(a[2]+(b[2]-a[2])*t)})`;
+}
+const SQUARE_COLORS = Array.from({ length: SQUARE_COUNT }, (_, i) => {
+  const t = i < 10 ? i / 10 : (SQUARE_COUNT - 1 - i) / 10;
+  return lerpHex(EMERALD, PURPLE, t);
+});
 
 // ── fizx 4×4 favicon block ────────────────────────────────────────────────────
-const FizxLogo = () => (
-  <svg width="16" height="16" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+const FizxLogo = ({ className }: { className?: string }) => (
+  <svg width="16" height="16" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg" className={className ?? 'shrink-0'}>
     <rect x="0" y="0" width="1" height="1" fill="#34d399"/>
     <rect x="1" y="0" width="1" height="1" fill="#a78bfa"/>
     <rect x="2" y="0" width="1" height="1" fill="#34d399"/>
@@ -179,6 +193,11 @@ function StatCard({
 
 export default function Index() {
   const stats = useEventStats();
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => (t < SQUARE_COUNT ? t + 1 : 0)), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   const kindEntries = Object.entries(stats.byKind)
     .sort(([, a], [, b]) => b - a)
@@ -209,11 +228,20 @@ export default function Index() {
 
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight mb-1">
-            <span className="bg-gradient-to-r from-[#34d399] via-[#a78bfa] to-[#34d399] bg-clip-text text-transparent">
-              Pulse
-            </span>
-          </h1>
+          <div className="flex items-center gap-3 mb-2">
+            <FizxLogo className="h-9 w-9 shrink-0" />
+            <h1 className="text-3xl font-bold tracking-tight">
+              <span className="bg-gradient-to-r from-[#34d399] via-[#a78bfa] to-[#34d399] bg-clip-text text-transparent">
+                pulse
+              </span>
+            </h1>
+          </div>
+          <div className="flex items-center gap-[3px] mb-3">
+            {SQUARE_COLORS.map((litColor, i) => (
+              <div key={i} className="flex-1 h-[10px] transition-colors duration-300"
+                style={{ backgroundColor: i < tick ? litColor : SQUARE_DIM }} />
+            ))}
+          </div>
           <p className="text-sm text-muted-foreground">
             Real-time Nostr relay statistics and event feed
           </p>
