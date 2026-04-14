@@ -188,20 +188,14 @@ export default function Index() {
       {/* Nav */}
       <nav className="border-b border-border px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <span className="font-mono text-sm">
-            <span className="bg-gradient-to-r from-[#34d399] via-[#a78bfa] to-[#34d399] bg-clip-text text-transparent font-bold">
-              pulse
-            </span>
-            <span className="text-muted-foreground">.fizx.uk</span>
-          </span>
-          <div className="flex items-center gap-4">
-            <Link to="/settings" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Settings">
-              <Settings className="h-4 w-4" />
-            </Link>
-            <a href="https://fizx.uk" className="font-mono text-xs text-muted-foreground hover:text-primary transition-colors">
-              fizx.uk
-            </a>
-          </div>
+          <a href="https://fizx.uk" className="font-mono text-sm">
+            <span className="bg-gradient-to-r from-[#34d399] via-[#a78bfa] to-[#34d399] bg-clip-text text-transparent font-bold">fizx</span>
+            <span className="text-muted-foreground">.uk</span>
+            <span className="text-muted-foreground/40 ml-1">/ pulse</span>
+          </a>
+          <Link to="/settings" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Settings">
+            <Settings className="h-4 w-4" />
+          </Link>
         </div>
       </nav>
 
@@ -334,9 +328,21 @@ export default function Index() {
 
       {/* Footer */}
       <footer className="border-t border-border px-6 py-5">
-        <div className="max-w-7xl mx-auto flex items-center justify-between text-xs text-muted-foreground font-mono">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-y-2 text-xs text-muted-foreground font-mono">
           <span>pulse.fizx.uk</span>
-          <span className="text-primary/60">✦ built with claude</span>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            {([
+              ['https://fizx.uk',         'fizx.uk'],
+              ['https://glimpse.fizx.uk', 'glimpse'],
+              ['https://pulse.fizx.uk',   'pulse'],
+              ['https://ln.fizx.uk',      'ln'],
+              ['https://stakes.fizx.uk',  'stakes'],
+              ['https://sonic.fizx.uk',   'sonic'],
+            ] as [string, string][]).map(([href, label]) => (
+              <a key={href} href={href} className="hover:text-primary transition-colors">{label}</a>
+            ))}
+            <span className="text-primary/60 ml-1">✦ built with claude</span>
+          </div>
         </div>
       </footer>
 
