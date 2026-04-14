@@ -11,8 +11,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { NostrLoginProvider } from '@nostrify/react/login';
 import { AppProvider } from '@/components/AppProvider';
-import { NWCProvider } from '@/contexts/NWCContext';
 import { AppConfig } from '@/contexts/AppContext';
+import { STREAMING_RELAYS } from '@/config/relays';
 import AppRouter from './AppRouter';
 
 const head = createHead({
@@ -34,11 +34,7 @@ const queryClient = new QueryClient({
 const defaultConfig: AppConfig = {
   theme: "dark",
   relayMetadata: {
-    relays: [
-      { url: 'wss://relay.primal.net', read: true, write: true },
-      { url: 'wss://relay.damus.io', read: true, write: true },
-      { url: 'wss://relay.upleb.uk', read: true, write: true },
-    ],
+    relays: STREAMING_RELAYS.map(url => ({ url, read: true, write: true })),
     updatedAt: 0,
   },
 };
@@ -46,19 +42,17 @@ const defaultConfig: AppConfig = {
 export function App() {
   return (
     <UnheadProvider head={head}>
-      <AppProvider storageKey="nostr:app-config" defaultConfig={defaultConfig}>
+      <AppProvider storageKey="pulse:app-config" defaultConfig={defaultConfig}>
         <QueryClientProvider client={queryClient}>
           <NostrLoginProvider storageKey='nostr:login'>
             <NostrProvider>
               <NostrSync />
-              <NWCProvider>
-                <TooltipProvider>
-                  <Toaster />
-                  <Suspense>
-                    <AppRouter />
-                  </Suspense>
-                </TooltipProvider>
-              </NWCProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Suspense>
+                  <AppRouter />
+                </Suspense>
+              </TooltipProvider>
             </NostrProvider>
           </NostrLoginProvider>
         </QueryClientProvider>
