@@ -6,6 +6,28 @@ import { formatDistanceToNowStrict } from 'date-fns';
 import { Activity, Radio, Users, Layers, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+// ── fizx 4×4 favicon block ────────────────────────────────────────────────────
+const FizxLogo = () => (
+  <svg width="16" height="16" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+    <rect x="0" y="0" width="1" height="1" fill="#34d399"/>
+    <rect x="1" y="0" width="1" height="1" fill="#a78bfa"/>
+    <rect x="2" y="0" width="1" height="1" fill="#34d399"/>
+    <rect x="3" y="0" width="1" height="1" fill="#a78bfa"/>
+    <rect x="0" y="1" width="1" height="1" fill="#a78bfa"/>
+    <rect x="1" y="1" width="1" height="1" fill="#34d399"/>
+    <rect x="2" y="1" width="1" height="1" fill="#a78bfa"/>
+    <rect x="3" y="1" width="1" height="1" fill="#34d399"/>
+    <rect x="0" y="2" width="1" height="1" fill="#34d399"/>
+    <rect x="1" y="2" width="1" height="1" fill="#a78bfa"/>
+    <rect x="2" y="2" width="1" height="1" fill="#34d399"/>
+    <rect x="3" y="2" width="1" height="1" fill="#a78bfa"/>
+    <rect x="0" y="3" width="1" height="1" fill="#a78bfa"/>
+    <rect x="1" y="3" width="1" height="1" fill="#34d399"/>
+    <rect x="2" y="3" width="1" height="1" fill="#a78bfa"/>
+    <rect x="3" y="3" width="1" height="1" fill="#34d399"/>
+  </svg>
+);
+
 // ── Relay comparison card ─────────────────────────────────────────────────────
 // Each column is its own component so hooks are called unconditionally.
 
@@ -170,8 +192,9 @@ export default function Index() {
 
       {/* Nav */}
       <nav className="border-b border-border px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <a href="https://fizx.uk" className="font-mono text-sm">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <a href="https://fizx.uk" className="flex items-center gap-2 font-mono text-sm" aria-label="fizx.uk">
+            <FizxLogo />
             <span className="bg-gradient-to-r from-[#34d399] via-[#a78bfa] to-[#34d399] bg-clip-text text-transparent font-bold">fizx</span>
             <span className="text-muted-foreground">.uk</span>
             <span className="text-muted-foreground/40 ml-1">/ pulse</span>
@@ -182,7 +205,7 @@ export default function Index() {
         </div>
       </nav>
 
-      <div className="flex-1 max-w-7xl mx-auto w-full px-6 py-10 space-y-8">
+      <div className="flex-1 max-w-5xl mx-auto w-full px-6 py-10 space-y-8">
 
         {/* Header */}
         <div>
@@ -307,7 +330,7 @@ export default function Index() {
 
       {/* Footer */}
       <footer className="border-t border-border px-6 py-5">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-y-2 text-xs text-muted-foreground font-mono">
+        <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-y-2 text-xs text-muted-foreground font-mono">
           <span>pulse.fizx.uk</span>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             {([
