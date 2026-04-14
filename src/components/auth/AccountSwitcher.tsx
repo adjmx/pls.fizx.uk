@@ -1,17 +1,13 @@
-// NOTE: This file is stable and usually should not be modified.
-// It is important that all functionality in this file is preserved, and should only be modified if explicitly requested.
-
-import { ChevronDown, LogOut, UserIcon, UserPlus } from 'lucide-react';
+import { ChevronDown, LogOut, UserPlus } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu.tsx';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
+} from '@/components/ui/dropdown-menu';
 import { useLoggedInAccounts, type Account } from '@/hooks/useLoggedInAccounts';
-import { genUserName } from '@/lib/genUserName';
+import { useNostrLogin } from '@nostrify/react/login';
 
 interface AccountSwitcherProps {
   onAddAccountClick: () => void;
@@ -19,59 +15,77 @@ interface AccountSwitcherProps {
 
 export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
   const { currentUser, otherUsers, setLogin, removeLogin } = useLoggedInAccounts();
+  const { logins } = useNostrLogin();
 
   if (!currentUser) return null;
 
-  const getDisplayName = (account: Account): string => {
-    return account.metadata.name ?? genUserName(account.pubkey);
-  }
+  const isReadOnly = logins[0]?.type === 'pubkey';
+  const displayName = (a: Account) =>
+    a.metadata.name || `${a.pubkey.slice(0, 8)}…${a.pubkey.slice(-4)}`;
 
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <button className='flex items-center gap-3 p-3 rounded-full hover:bg-accent transition-all w-full text-foreground'>
-          <Avatar className='w-10 h-10'>
-            <AvatarImage src={currentUser.metadata.picture} alt={getDisplayName(currentUser)} />
-            <AvatarFallback>{getDisplayName(currentUser).charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div className='flex-1 text-left hidden md:block truncate'>
-            <p className='font-medium text-sm truncate'>{getDisplayName(currentUser)}</p>
-          </div>
-          <ChevronDown className='w-4 h-4 text-muted-foreground' />
+        <button className="flex items-center gap-1.5 px-2 py-1.5 border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors font-mono text-xs">
+          {isReadOnly && (
+            <span className="text-[9px] opacity-50" title="read only">👁</span>
+          )}
+          <span className="max-w-[120px] truncate">{displayName(currentUser)}</span>
+          <ChevronDown className="w-3 h-3 shrink-0 opacity-60" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className='w-56 p-2 animate-scale-in'>
-        <div className='font-medium text-sm px-2 py-1.5'>Switch Account</div>
-        {otherUsers.map((user) => (
-          <DropdownMenuItem
-            key={user.id}
-            onClick={() => setLogin(user.id)}
-            className='flex items-center gap-2 cursor-pointer p-2 rounded-md'
-          >
-            <Avatar className='w-8 h-8'>
-              <AvatarImage src={user.metadata.picture} alt={getDisplayName(user)} />
-              <AvatarFallback>{getDisplayName(user)?.charAt(0) || <UserIcon />}</AvatarFallback>
-            </Avatar>
-            <div className='flex-1 truncate'>
-              <p className='text-sm font-medium'>{getDisplayName(user)}</p>
+
+      <DropdownMenuContent
+        align="end"
+        className="rounded-none border-border bg-background min-w-[180px] p-0"
+      >
+        {/* Identity header */}
+        <div className="px-3 py-2.5 border-b border-border/60">
+          <p className="text-[9px] font-mono text-muted-foreground/50 truncate">
+            {currentUser.pubkey.slice(0, 20)}…
+          </p>
+          {isReadOnly && (
+            <p className="text-[9px] font-mono text-accent/60 mt-0.5">read only</p>
+          )}
+        </div>
+
+        {/* Other accounts */}
+        {otherUsers.length > 0 && (
+          <>
+            <div className="px-3 pt-2 pb-1">
+              <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground/40">
+                switch
+              </p>
             </div>
-            {user.id === currentUser.id && <div className='w-2 h-2 rounded-full bg-primary'></div>}
-          </DropdownMenuItem>
-        ))}
-        <DropdownMenuSeparator />
+            {otherUsers.map(user => (
+              <DropdownMenuItem
+                key={user.id}
+                onClick={() => setLogin(user.id)}
+                className="rounded-none font-mono text-xs px-3 py-2 cursor-pointer focus:bg-card"
+              >
+                <span className="truncate">{displayName(user)}</span>
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator className="bg-border/60 my-0" />
+          </>
+        )}
+
         <DropdownMenuItem
           onClick={onAddAccountClick}
-          className='flex items-center gap-2 cursor-pointer p-2 rounded-md'
+          className="rounded-none font-mono text-xs px-3 py-2 cursor-pointer focus:bg-card gap-2"
         >
-          <UserPlus className='w-4 h-4' />
-          <span>Add another account</span>
+          <UserPlus className="w-3 h-3" />
+          add account
         </DropdownMenuItem>
+
+        <DropdownMenuSeparator className="bg-border/60 my-0" />
+
         <DropdownMenuItem
           onClick={() => removeLogin(currentUser.id)}
-          className='flex items-center gap-2 cursor-pointer p-2 rounded-md text-red-500'
+          className="rounded-none font-mono text-xs px-3 py-2 cursor-pointer focus:bg-card gap-2 text-red-400 focus:text-red-300"
         >
-          <LogOut className='w-4 h-4' />
-          <span>Log out</span>
+          <LogOut className="w-3 h-3" />
+          disconnect
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

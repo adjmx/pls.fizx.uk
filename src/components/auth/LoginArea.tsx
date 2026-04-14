@@ -1,12 +1,7 @@
-// NOTE: This file is stable and usually should not be modified.
-// It is important that all functionality in this file is preserved, and should only be modified if explicitly requested.
-
 import { useState } from 'react';
-import { Button } from '@/components/ui/button.tsx';
-import LoginDialog from './LoginDialog';
-import SignupDialog from './SignupDialog';
 import { useLoggedInAccounts } from '@/hooks/useLoggedInAccounts';
 import { AccountSwitcher } from './AccountSwitcher';
+import LoginDialog from './LoginDialog';
 import { cn } from '@/lib/utils';
 
 export interface LoginAreaProps {
@@ -15,45 +10,21 @@ export interface LoginAreaProps {
 
 export function LoginArea({ className }: LoginAreaProps) {
   const { currentUser } = useLoggedInAccounts();
-  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
-  const [signupDialogOpen, setSignupDialogOpen] = useState(false);
-
-  const handleLogin = () => {
-    setLoginDialogOpen(false);
-    setSignupDialogOpen(false);
-  };
+  const [open, setOpen] = useState(false);
 
   return (
-    <div className={cn("inline-flex items-center justify-center", className)}>
+    <div className={cn('inline-flex items-center', className)}>
       {currentUser ? (
-        <AccountSwitcher onAddAccountClick={() => setLoginDialogOpen(true)} />
+        <AccountSwitcher onAddAccountClick={() => setOpen(true)} />
       ) : (
-        <div className="flex gap-3 justify-center">
-          <Button
-            onClick={() => setLoginDialogOpen(true)}
-            className='flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground w-full font-medium transition-all hover:bg-primary/90 animate-scale-in'
-          >
-            <span className='truncate'>Log in</span>
-          </Button><Button
-            onClick={() => setSignupDialogOpen(true)}
-            variant="outline"
-            className="flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-all"
-          >
-            <span>Sign up</span>
-          </Button>
-        </div>
+        <button
+          onClick={() => setOpen(true)}
+          className="font-mono text-xs px-3 py-1.5 border border-border text-muted-foreground hover:border-primary/60 hover:text-primary transition-colors"
+        >
+          connect
+        </button>
       )}
-
-      <LoginDialog
-        isOpen={loginDialogOpen}
-        onClose={() => setLoginDialogOpen(false)}
-        onLogin={handleLogin}
-      />
-
-      <SignupDialog
-        isOpen={signupDialogOpen}
-        onClose={() => setSignupDialogOpen(false)}
-      />
+      <LoginDialog isOpen={open} onClose={() => setOpen(false)} onLogin={() => setOpen(false)} />
     </div>
   );
 }

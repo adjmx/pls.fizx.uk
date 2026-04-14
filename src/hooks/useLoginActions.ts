@@ -12,11 +12,13 @@ export function useLoginActions() {
     // Read-only login with npub (cannot sign events)
     npub(npub: string): void {
       const decoded = nip19.decode(npub);
-      if (decoded.type !== 'npub') {
-        throw new Error('Invalid npub format');
-      }
-      const pubkey = decoded.data;
-      const login = NLogin.fromPubkey(pubkey);
+      if (decoded.type !== 'npub') throw new Error('Invalid npub format');
+      const login = NLogin.fromPubkey(decoded.data);
+      addLogin(login);
+    },
+    // Login with a Nostr secret key
+    nsec(nsec: string): void {
+      const login = NLogin.fromNsec(nsec);
       addLogin(login);
     },
     // Login with a NIP-46 "bunker://" URI
@@ -32,9 +34,7 @@ export function useLoginActions() {
     // Log out the current user
     async logout(): Promise<void> {
       const login = logins[0];
-      if (login) {
-        removeLogin(login.id);
-      }
-    }
+      if (login) removeLogin(login.id);
+    },
   };
 }
