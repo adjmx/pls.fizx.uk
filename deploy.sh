@@ -1,5 +1,5 @@
 #!/bin/bash
-# deploy.sh - Deploy folio.fizx.uk to your server
+# deploy.sh - Deploy pulse.fizx.uk to your server
 # Usage: ./deploy.sh
 
 set -e
@@ -8,7 +8,7 @@ set -e
 # CONFIGURATION - Edit these values
 # ============================================
 SERVER="root@88.218.206.187"       # <-- CHANGE THIS: your SSH user@hostname
-REMOTE_PATH="/var/www/folio.fizx.uk" # <-- CHANGE THIS if different on your server
+REMOTE_PATH="/var/www/pulse.fizx.uk" # <-- CHANGE THIS if different on your server
 SSH_PORT="2121"                        # <-- CHANGE THIS if using non-standard SSH port
 
 # Local paths

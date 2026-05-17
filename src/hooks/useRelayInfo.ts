@@ -34,7 +34,7 @@ async function fetchRelayInfo(wsUrl: string): Promise<RelayInfo> {
   const url = wsUrl.replace(/^wss:\/\//, 'https://').replace(/^ws:\/\//, 'http://');
   const res = await fetch(url, {
     headers: { Accept: 'application/nostr+json' },
-    signal: AbortSignal.timeout(6000),
+    signal: AbortSignal.timeout(8000),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
@@ -45,6 +45,7 @@ export function useRelayInfo(wsUrl: string) {
     queryKey: ['relay-nip11', wsUrl],
     queryFn: () => fetchRelayInfo(wsUrl),
     staleTime: 5 * 60 * 1000,
-    retry: 1,
+    retry: 3,
+    retryDelay: 2000,
   });
 }
