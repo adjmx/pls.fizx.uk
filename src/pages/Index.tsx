@@ -17,7 +17,7 @@ function AnimatedTitle({ accent, rest = '', from: f, to: t, suffixRgba, fontSize
   return (
     <>
       <style>{TITLE_ANIM_CSS}</style>
-      <h1 className="font-bold tracking-tight" style={{ fontSize }}>
+      <h1 className="font-sans font-bold tracking-tight" style={{ fontSize }}>
         {ac.map((ch, i) => {
           const start = lerpRgb(fromRgb, toRgb, aLen > 0 ? i / aLen : 0);
           const end   = lerpRgb(fromRgb, toRgb, aLen > 0 ? (i + 1) / aLen : 1);
