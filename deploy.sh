@@ -1,5 +1,5 @@
 #!/bin/bash
-# deploy.sh - Deploy pulse.fizx.uk to your server
+# deploy.sh - Deploy pls.fizx.uk to your server
 # Usage: ./deploy.sh
 
 set -e
@@ -8,7 +8,7 @@ set -e
 # CONFIGURATION - Edit these values
 # ============================================
 SERVER="root@88.218.206.187"       # <-- CHANGE THIS: your SSH user@hostname
-REMOTE_PATH="/var/www/pulse.fizx.uk" # <-- CHANGE THIS if different on your server
+REMOTE_PATH="/var/www/pls.fizx.uk" # <-- CHANGE THIS if different on your server
 SSH_PORT="2121"                        # <-- CHANGE THIS if using non-standard SSH port
 
 # Local paths
@@ -23,7 +23,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo -e "${GREEN}🚀 Starting deployment of folio.fizx.uk${NC}"
+echo -e "${GREEN}🚀 Starting deployment of pls.fizx.uk${NC}"
 echo "=========================================="
 
 # ============================================
@@ -110,10 +110,10 @@ echo -e "${GREEN}✅ Deployment complete!${NC}"
 echo "=========================================="
 echo ""
 echo "🌐 Your site should be live at:"
-echo "   https://folio.fizx.uk"
+echo "   https://pls.fizx.uk"
 echo ""
 echo "🧪 Quick checks:"
-echo "   curl -I https://folio.fizx.uk"
+echo "   curl -I https://pls.fizx.uk"
 echo ""
 echo "📋 If you see 403 errors, check permissions:"
 echo "   ssh $SERVER 'sudo chown -R www-data:www-data $REMOTE_PATH'"
