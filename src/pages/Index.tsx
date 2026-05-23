@@ -296,7 +296,7 @@ function RelayColumn({ url }: { url: string }) {
 // reference (e.g. relay.nostr.band as a generic public relay).
 const PRIMARY_RELAY_KEY = 'pulse_primary_relay';
 const PRIMARY_RELAY_DEFAULT = 'wss://relay.fizx.uk';
-const SECONDARY_RELAY_URL = 'wss://relay.nostr.band';
+const PAGE_RELAY = 'wss://relay.fizx.uk';
 
 function PrimaryRelayCard({ extras }: { extras?: React.ReactNode }) {
   const [url, setUrl] = useState<string>(() => {
@@ -346,7 +346,7 @@ function PrimaryRelayCard({ extras }: { extras?: React.ReactNode }) {
 }
 
 /** Compact horizontal strip showing NIP-11 metadata for a fixed relay URL. */
-function RelayBadge({ url = SECONDARY_RELAY_URL, bare = false }: { url?: string; bare?: boolean }) {
+function RelayBadge({ url = PAGE_RELAY, bare = false }: { url?: string; bare?: boolean }) {
   const { data: info, isLoading, isError } = useRelayInfo(url);
   const domain = url.replace(/^wss?:\/\//, '');
 
@@ -472,38 +472,6 @@ function RelayComparisonCard({ extras }: { extras?: React.ReactNode }) {
   );
 }
 
-/** Inline "edit relay" control — toggles between an "edit relay" link and a
- *  text input. Persists to localStorage so the change survives reloads. */
-function RelayEdit({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(value);
-  const save = () => {
-    const trimmed = draft.trim();
-    if (trimmed) {
-      onChange(trimmed);
-      try { localStorage.setItem(PRIMARY_RELAY_KEY, trimmed); } catch {}
-    }
-    setEditing(false);
-  };
-  return editing ? (
-    <div className="flex gap-1">
-      <input
-        className="flex-1 text-[10px] font-mono bg-background border border-border px-2 py-1 text-foreground focus:outline-none focus:border-primary/50"
-        value={draft}
-        onChange={e => setDraft(e.target.value)}
-        onKeyDown={e => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false); }}
-        autoFocus
-      />
-      <button onClick={save} className="text-[10px] font-mono px-2 py-1 border border-primary/30 text-primary/70 hover:text-primary hover:border-primary/60 transition-colors shrink-0">ok</button>
-    </div>
-  ) : (
-    <button
-      onClick={() => { setDraft(value); setEditing(true); }}
-      className="text-[9px] font-mono text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors"
-    >edit relay</button>
-  );
-}
-
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 /** Round n to nearest 250 band for approximate display */
@@ -600,9 +568,6 @@ function StatCard({
 export default function Index() {
   const stats = useEventStats();
   const relayStats = useRelayStats();
-  const [primaryRelay, setPrimaryRelay] = useState<string>(() => {
-    try { return localStorage.getItem(PRIMARY_RELAY_KEY) ?? PRIMARY_RELAY_DEFAULT; } catch { return PRIMARY_RELAY_DEFAULT; }
-  });
   const [tick, setTick] = useState(0);
   useEffect(() => {
     const id = setInterval(() => setTick(t => (t < SQUARE_COUNT ? t + 1 : 0)), 1000);
@@ -656,12 +621,11 @@ export default function Index() {
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 mb-1.5">
-                <span className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground/50">Streaming Relays</span>
+                <span className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground/50">Streaming Relay</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shrink-0" />
               </div>
-              <div className="flex flex-col gap-1.5 font-mono">
-                <RelayBadge url={primaryRelay} bare />
-                <RelayBadge url={SECONDARY_RELAY_URL} bare />
+              <div className="font-mono">
+                <RelayBadge url={PAGE_RELAY} bare />
               </div>
             </div>
           </div>
@@ -697,9 +661,6 @@ export default function Index() {
                   </div>
                 ))
               )}
-            </div>
-            <div className="mt-3 pt-3 border-t border-border/40">
-              <RelayEdit value={primaryRelay} onChange={setPrimaryRelay} />
             </div>
           </div>
           <div className="mt-2">
